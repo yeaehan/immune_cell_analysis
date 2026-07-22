@@ -8,7 +8,7 @@ Streamlit dashboard.
 
 ## Dashboard
 
-**Deployed dashboard:** Add the deployed Streamlit URL here before submission.
+**Deployed dashboard:** 
 
 The dashboard can also be run locally or in GitHub Codespaces using
 `make dashboard`. In Codespaces, open the forwarded URL for port `8501` from
