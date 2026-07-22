@@ -298,10 +298,22 @@ subset_samples = sample_metadata[
     & (sample_metadata["time_from_treatment_start"] == 0)
 ]
 
-subset_sample_count, subset_subject_count = st.columns(2)
+(
+    subset_sample_count,
+    subset_subject_count,
+    subset_median_age,
+    subset_age_range,
+) = st.columns(4)
 subset_sample_count.metric("Matching samples", subset_samples["sample"].nunique())
 subset_subject_count.metric(
     "Matching subjects", subset_samples["subject"].nunique()
+)
+subset_median_age.metric(
+    "Median age", f"{subset_samples['age'].median():.0f} years"
+)
+subset_age_range.metric(
+    "Age range",
+    f"{int(subset_samples['age'].min())}–{int(subset_samples['age'].max())}",
 )
 
 project_counts = (
