@@ -32,7 +32,7 @@ make dashboard
 The Makefile targets are:
 
 - `make setup`: installs the project and all dependencies from
-  `pyproject.toml`.
+  `requirements.txt`.
 - `make pipeline`: recreates the SQLite database from the input CSV and
   generates every analysis table and plot.
 - `make dashboard`: starts the Streamlit dashboard on port `8501`.
@@ -90,8 +90,7 @@ joining subject, sample, and measurement data without duplicating metadata.
 ├── clinical_trial_patients.db       # Generated SQLite database
 ├── results/                         # Generated tables and plot
 ├── .streamlit/config.toml           # Dashboard server configuration
-├── pyproject.toml                   # Project metadata and dependencies
-├── requirements.txt                 # Streamlit Cloud dependencies
+├── requirements.txt                 # Python dependencies
 └── Makefile                         # Automated grading commands
 ```
 
