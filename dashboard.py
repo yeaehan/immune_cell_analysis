@@ -257,7 +257,7 @@ if statistics_path.exists() and boxplot_path.exists():
         str(boxplot_path),
         caption=(
             "Immune cell relative frequencies in PBMC from melanoma patients "
-            " receiving Miraclib, comparing treatment response"
+            "receiving Miraclib, comparing treatment response"
         ),
         width="stretch",
     )

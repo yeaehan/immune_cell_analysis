@@ -73,11 +73,6 @@ discovers numeric cell-population columns from the input CSV automatically.
 This structure supports hundreds of projects and thousands of samples by
 adding rows to the existing tables. It also supports different analytics by
 joining subject, sample, and measurement data without duplicating metadata.
-For substantially larger datasets, the next improvements would be chunked CSV
-loading, incremental inserts or upserts instead of a complete rebuild, and
-indexes selected for observed query patterns. If the system required many
-simultaneous writers or millions of continuously updated samples, the same
-relational design could be migrated from SQLite to PostgreSQL.
 
 ## Code structure
 
