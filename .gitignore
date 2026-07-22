@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+.venv*/
+
+# Local caches and secrets
+.mplconfig/
+.streamlit/secrets.toml
+
+# Editor and operating-system files
+.DS_Store
+.vscode/
+.idea/

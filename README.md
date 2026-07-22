@@ -1,0 +1,139 @@
+# Clinical Trial Immune Cell Analysis
+
+This project analyzes immune-cell populations from a clinical trial. It loads
+the supplied CSV into a normalized SQLite database, calculates cell-type
+frequencies, compares miraclib responders with non-responders, performs the
+requested baseline subset analysis, and presents the results in an interactive
+Streamlit dashboard.
+
+## Dashboard
+
+**Deployed dashboard:** Add the deployed Streamlit URL here before submission.
+
+The dashboard can also be run locally or in GitHub Codespaces using
+`make dashboard`. In Codespaces, open the forwarded URL for port `8501` from
+the **Ports** tab after starting the dashboard.
+
+## Reproduce the analysis
+
+Python 3.11 or newer is required. From the repository root, run:
+
+```bash
+make setup
+make pipeline
+make dashboard
+```
+
+The Makefile targets are:
+
+- `make setup`: installs the project and all dependencies from
+  `pyproject.toml`.
+- `make pipeline`: recreates the SQLite database from the input CSV and
+  generates every analysis table and plot.
+- `make dashboard`: starts the Streamlit dashboard on port `8501`.
+
+The two pipeline stages can also be run directly:
+
+```bash
+python load_data.py
+python analysis.py
+```
+
+`load_data.py` requires no command-line arguments. It reads
+`data/cell-count.csv` and creates `clinical_trial_patients.db` in the
+repository root. Running the pipeline again safely rebuilds the database and
+outputs, which prevents stale or duplicated results.
+
+## Database schema
+
+The source CSV is transformed from a wide file into five related tables:
+
+| Table | Purpose | Key relationships |
+|---|---|---|
+| `projects` | One row per clinical project | `project_id` is the primary key |
+| `subjects` | Condition, age, sex, treatment, and response for each subject | References `projects` |
+| `samples` | Sample type and treatment-start time for each collected sample | References `subjects` |
+| `cell_populations` | Valid immune-cell population names | `population` is the primary key |
+| `cell_counts` | One count per sample and cell population | References `samples` and `cell_populations` |
+
+The schema is normalized so subject metadata is stored once rather than
+repeated for every sample and every cell population. Primary keys prevent
+duplicate records, foreign keys prevent orphaned records, and constraints
+reject invalid values such as negative cell counts. Indexes cover fields used
+frequently by the analysis, including condition, treatment, response, sample
+type, time point, and population.
+
+Cell populations are stored as rows instead of fixed database columns. A new
+population can therefore be added to `cell_populations` and measured through
+new `cell_counts` rows without altering the table structure. The loader also
+discovers numeric cell-population columns from the input CSV automatically.
+
+### Scaling
+
+This structure supports hundreds of projects and thousands of samples by
+adding rows to the existing tables. It also supports different analytics by
+joining subject, sample, and measurement data without duplicating metadata.
+For substantially larger datasets, the next improvements would be chunked CSV
+loading, incremental inserts or upserts instead of a complete rebuild, and
+indexes selected for observed query patterns. If the system required many
+simultaneous writers or millions of continuously updated samples, the same
+relational design could be migrated from SQLite to PostgreSQL.
+
+## Code structure
+
+```text
+.
+├── data/cell-count.csv              # Supplied input data
+├── load_data.py                     # Creates and loads SQLite
+├── analysis.py                      # Parts 2–4 and generated outputs
+├── dashboard.py                     # Interactive Streamlit application
+├── clinical_trial_patients.db       # Generated SQLite database
+├── results/                         # Generated tables and plot
+├── .streamlit/config.toml           # Dashboard server configuration
+├── pyproject.toml                   # Project metadata and dependencies
+└── Makefile                         # Automated grading commands
+```
+
+The code separates data loading, analysis, and presentation so each stage has
+one responsibility. `load_data.py` owns the database schema and ingestion.
+`analysis.py` queries the database, generates reproducible results, and saves
+them under `results/`. `dashboard.py` reads the database and generated outputs
+to provide interactive filters and result displays.
+
+## Analysis methods
+
+For each sample, relative frequency is calculated as:
+
+```text
+percentage = 100 × population count / total sample count
+```
+
+The response comparison includes only PBMC samples from melanoma subjects
+treated with miraclib. Each subject contributes one mean frequency per cell
+population so repeated time points are not treated as independent subjects.
+Responders and non-responders are two independent, unpaired groups, so their
+frequency distributions are compared with a two-sided Mann–Whitney U test.
+This nonparametric test does not require the frequencies to follow a normal
+distribution. Because a separate test is performed for each of the five cell
+populations, the raw p-values are adjusted for multiple testing with the
+Benjamini–Hochberg procedure. The adjusted p-values control the expected false
+discovery rate and reduce the chance of reporting a difference that occurred
+only because several hypotheses were tested.
+
+The baseline subset contains melanoma PBMC samples collected at time `0` from
+miraclib-treated subjects. The pipeline reports sample counts by project and
+unique-subject counts by response and sex. The requested B-cell average uses
+male melanoma responders at time `0` across all treatments and sample types.
+
+## Generated outputs
+
+Running `make pipeline` creates:
+
+- `results/frequency_summary.csv`
+- `results/statistical_results.csv`
+- `results/response_boxplot.png`
+- `results/baseline_samples.csv`
+- `results/baseline_project_counts.csv`
+- `results/baseline_response_counts.csv`
+- `results/baseline_sex_counts.csv`
+- `results/average_b_cell_count.csv`
