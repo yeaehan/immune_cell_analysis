@@ -86,6 +86,7 @@ joining subject, sample, and measurement data without duplicating metadata.
 ├── results/                         # Generated tables and plot
 ├── .streamlit/config.toml           # Dashboard server configuration
 ├── pyproject.toml                   # Project metadata and dependencies
+├── requirements.txt                 # Streamlit Cloud dependencies
 └── Makefile                         # Automated grading commands
 ```
 
