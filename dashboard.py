@@ -298,22 +298,10 @@ subset_samples = sample_metadata[
     & (sample_metadata["time_from_treatment_start"] == 0)
 ]
 
-(
-    subset_sample_count,
-    subset_subject_count,
-    subset_median_age,
-    subset_age_range,
-) = st.columns(4)
+subset_sample_count, subset_subject_count = st.columns(2)
 subset_sample_count.metric("Matching samples", subset_samples["sample"].nunique())
 subset_subject_count.metric(
     "Matching subjects", subset_samples["subject"].nunique()
-)
-subset_median_age.metric(
-    "Median age", f"{subset_samples['age'].median():.0f} years"
-)
-subset_age_range.metric(
-    "Age range",
-    f"{int(subset_samples['age'].min())}–{int(subset_samples['age'].max())}",
 )
 
 project_counts = (
@@ -328,15 +316,7 @@ sex_counts = (
     subset_samples.groupby("sex", as_index=False)
     .agg(subject_count=("subject", "nunique"))
 )
-age_decade = (subset_samples["age"] // 10) * 10
-age_group_samples = subset_samples.assign(
-    age_group=age_decade.astype(str) + "–" + (age_decade + 9).astype(str)
-)
-age_counts = (
-    age_group_samples.groupby("age_group", as_index=False)
-    .agg(subject_count=("subject", "nunique"))
-)
-project_column, response_column, sex_column, age_column = st.columns(4)
+project_column, response_column, sex_column = st.columns(3)
 with project_column:
     st.subheader("Samples by project")
     st.dataframe(project_counts, hide_index=True, width="stretch")
@@ -346,9 +326,6 @@ with response_column:
 with sex_column:
     st.subheader("Subjects by sex")
     st.dataframe(sex_counts, hide_index=True, width="stretch")
-with age_column:
-    st.subheader("Subjects by age group")
-    st.dataframe(age_counts, hide_index=True, width="stretch")
 
 with st.expander("View matching samples"):
     st.dataframe(

@@ -117,9 +117,7 @@ across the five cell populations using the Benjamini–Hochberg procedure.
 
 The baseline subset contains melanoma PBMC samples collected at time `0` from
 miraclib-treated subjects. The pipeline reports sample counts by project and
-unique-subject counts by response and sex. The dashboard also summarizes
-subjects in 10-year age groups because immune-cell distributions can vary with
-age.
+unique-subject counts by response and sex.
 
 The requested B-cell average uses male melanoma responders at time `0` across all treatments and sample types.
 
