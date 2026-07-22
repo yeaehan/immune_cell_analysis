@@ -328,7 +328,15 @@ sex_counts = (
     subset_samples.groupby("sex", as_index=False)
     .agg(subject_count=("subject", "nunique"))
 )
-project_column, response_column, sex_column = st.columns(3)
+age_decade = (subset_samples["age"] // 10) * 10
+age_group_samples = subset_samples.assign(
+    age_group=age_decade.astype(str) + "–" + (age_decade + 9).astype(str)
+)
+age_counts = (
+    age_group_samples.groupby("age_group", as_index=False)
+    .agg(subject_count=("subject", "nunique"))
+)
+project_column, response_column, sex_column, age_column = st.columns(4)
 with project_column:
     st.subheader("Samples by project")
     st.dataframe(project_counts, hide_index=True, width="stretch")
@@ -338,6 +346,9 @@ with response_column:
 with sex_column:
     st.subheader("Subjects by sex")
     st.dataframe(sex_counts, hide_index=True, width="stretch")
+with age_column:
+    st.subheader("Subjects by age group")
+    st.dataframe(age_counts, hide_index=True, width="stretch")
 
 with st.expander("View matching samples"):
     st.dataframe(
