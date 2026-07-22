@@ -21,6 +21,11 @@ Python 3.11 or newer is required. From the repository root, run:
 ```bash
 make setup
 make pipeline
+```
+
+To start the interactive dashboard, run:
+
+```bash
 make dashboard
 ```
 
@@ -105,21 +110,17 @@ percentage = 100 × population count / total sample count
 ```
 
 The response comparison includes only PBMC samples from melanoma subjects
-treated with miraclib. Each subject contributes one mean frequency per cell
-population so repeated time points are not treated as independent subjects.
-Responders and non-responders are two independent, unpaired groups, so their
-frequency distributions are compared with a two-sided Mann–Whitney U test.
-This nonparametric test does not require the frequencies to follow a normal
-distribution. Because a separate test is performed for each of the five cell
-populations, the raw p-values are adjusted for multiple testing with the
-Benjamini–Hochberg procedure. The adjusted p-values control the expected false
-discovery rate and reduce the chance of reporting a difference that occurred
-only because several hypotheses were tested.
+treated with miraclib. The boxplot displays relative frequencies for all
+eligible samples. For statistical testing, frequencies are averaged per
+subject across treatment time points, and responders are compared with
+non-responders using a two-sided Mann–Whitney U test. P-values are adjusted
+across the five cell populations using the Benjamini–Hochberg procedure.
 
 The baseline subset contains melanoma PBMC samples collected at time `0` from
 miraclib-treated subjects. The pipeline reports sample counts by project and
-unique-subject counts by response and sex. The requested B-cell average uses
-male melanoma responders at time `0` across all treatments and sample types.
+unique-subject counts by response and sex. Age is included as descriptive context because immune-cell distributions can vary with age.
+
+The requested B-cell average uses male melanoma responders at time `0` across all treatments and sample types.
 
 ## Generated outputs
 
